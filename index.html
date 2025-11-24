@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dolar Getting - Realistic</title>
+    <title>Dolar Getting - Themed</title>
     <style>
+        /* ... (CSS-стили без изменений, кроме кнопок для надежности) ... */
         body {
-            font-family: sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            background-color: #006400; /* Темно-зеленый, напоминающий доллар */
+            background-color: #2e7d32;
             overflow: hidden;
             position: relative;
         }
 
-        /* --- Стили для Реалистичного Анимированного Фона --- */
-        .money-background {
+        .falling-elements-background {
             position: absolute;
             top: 0;
             left: 0;
@@ -27,201 +27,463 @@
             height: 100%;
             pointer-events: none;
             z-index: 0;
-            perspective: 1000px;
+            perspective: 800px;
         }
 
-        .money-item {
+        .falling-item {
             position: absolute;
             font-size: 2.5em;
             line-height: 1;
             opacity: 0.7;
-            filter: grayscale(30%) brightness(1.2);
             will-change: transform, opacity;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.3));
         }
         
-        @keyframes realisticFall {
+        @keyframes fallAndRotate {
             0% {
-                transform: translate3d(0, 0, 0) rotateZ(0deg) rotateY(0deg);
-                opacity: 0.2;
+                transform: translate3d(var(--start-x), var(--start-y), 0) rotateZ(0deg) rotateY(0deg);
+                opacity: 0;
             }
             10% {
-                 opacity: 0.9;
+                opacity: 0.8;
             }
             100% {
-                transform: translate3d(var(--x-end), 120vh, 0) rotateZ(var(--z-rot)) rotateY(var(--y-rot));
+                transform: translate3d(var(--end-x), 110vh, var(--depth)) rotateZ(var(--z-rot)) rotateY(var(--y-rot));
                 opacity: 0;
             }
         }
 
-        /* --- Игровой контейнер теперь с фоном из эмодзи 💵 --- */
         #game-container {
             text-align: center;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
             z-index: 10;
             position: relative;
-            
-            /* --- НОВЫЕ СТИЛИ ДЛЯ ФОНА ИЗ ЭМОДЗИ 💵 --- */
-            /* Используем Data URI для эмодзи 💵 */
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><text x="5" y="30" style="font-size: 30px; opacity: 0.3;">💵</text></svg>');
-            background-size: 80px 40px; /* Размер одного "блока" эмодзи */
-            background-repeat: repeat; /* Повторяем, чтобы создать узор */
-            background-color: #338833; /* Основной цвет фона, если эмодзи не загрузятся */
-            border: 5px solid #388E3C; 
-            color: white; 
+            background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
+            border: 6px solid #2e7d32;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><text x="5" y="30" style="font-size: 30px; fill:%232e7d32; opacity: 0.2;"></text></svg>');
+            background-size: 80px 40px;
+            background-repeat: repeat;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        #game-container h1, #game-container #score-display {
-             color: white;
-             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        h1#game-title {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            letter-spacing: 1px;
         }
 
         #score-display {
-            font-size: 2.5em;
-            margin-bottom: 25px;
+            font-size: 3em;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            font-weight: bold;
         }
 
         #click-button {
             padding: 25px 50px;
             font-size: 1.8em;
             cursor: pointer;
-            background-color: #008000;
+            background: linear-gradient(180deg, #5cb85c 0%, #449d44 100%);
             color: white;
-            border: none;
-            border-radius: 8px;
-            transition: background-color 0.1s ease, transform 0.1s ease;
+            border: 3px solid #3d8f3d;
+            border-radius: 10px;
+            box-shadow: 0 5px 0 #3d8f3d, 0 8px 15px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            transition: all 0.1s ease;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         #click-button:hover {
-            background-color: #006400;
+            background: linear-gradient(180deg, #449d44 0%, #5cb85c 100%);
+            transform: translateY(1px);
+            box-shadow: 0 3px 0 #3d8f3d, 0 6px 12px rgba(0,0,0,0.3);
         }
 
         #click-button:active {
-            transform: scale(0.96);
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #3d8f3d, 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        /* --- Эмодзи при клике (остаются прежними) --- */
-        .money-emoji {
+        #shop-button {
             position: absolute;
-            font-size: 2em;
-            opacity: 0;
-            animation: fallClick 2s ease-out forwards; 
-            pointer-events: none;
-            z-index: 5;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #00bcd4;
+            color: white;
+            font-size: 2.2em;
+            border: 4px solid #0097a7;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #0097a7, 0 5px 10px rgba(0,0,0,0.4);
+            transition: transform 0.1s;
+            line-height: 60px;
+            text-align: center;
+            z-index: 15;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @keyframes fallClick {
+        #shop-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0097a7, 0 3px 6px rgba(0,0,0,0.4);
+        }
+
+        #shop-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            width: 80%;
+            max-width: 400px;
+            color: #333;
+            text-align: left;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            color: #2e7d32;
+            margin-top: 0;
+        }
+
+        .close-shop-button {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 40px;
+            height: 40px;
+            background-color: #f44336;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: background-color 0.1s;
+        }
+        
+        .close-shop-button::before, .close-shop-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 4px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .close-shop-button::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+        
+        .close-shop-button::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .close-shop-button:hover {
+            background-color: #d32f2f;
+        }
+
+        #buy-upgrade-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        #buy-upgrade-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        #buy-upgrade-button:not(:disabled):hover {
+            background-color: #45a049;
+        }
+
+        .click-effect {
+            position: absolute;
+            font-size: 1.5em;
+            opacity: 0;
+            animation: clickPop 0.8s ease-out forwards;
+            pointer-events: none;
+            z-index: 11;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));
+        }
+
+        @keyframes clickPop {
             0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            70% {
+                transform: translate(-50%, -50%) scale(0.5);
                 opacity: 1;
             }
             100% {
-                transform: translateY(100vh) scale(0.8);
+                transform: translate(var(--end-x-offset), var(--end-y-offset)) scale(1.2);
                 opacity: 0;
             }
+        }
+        
+        #passive-info {
+            font-size: 0.9em;
+            color: #eee;
+            margin-top: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <div class="money-background" id="money-background">
-        </div>
+    <div class="falling-elements-background" id="falling-elements-background"></div>
 
     <div id="game-container">
-        <h1>Dolar Getting</h1>
+        <button id="shop-button">
+            💎
+        </button>
+
+        <h1 id="game-title">Dolar Getting</h1>
         <div id="score-display">Score: 0</div>
+        <div id="passive-info"></div>
         
         <button id="click-button">Click To Get Dolar!</button>
     </div>
 
+    <div id="shop-modal">
+        <div class="modal-content">
+            <div class="close-shop-button" id="close-modal-button"></div>
+            
+            <h2>Магазин Апгрейдов</h2>
+            <div id="shop-content">
+                <p><strong>Пассивный Доход</strong></p>
+                <p>Улучшение: <span id="upgrade-count-display">0</span></p>
+                <p>Эффект: +1 очко каждые 5 секунд (за каждое улучшение)</p>
+                <p>Следующая цена: <span id="upgrade-cost-display">10</span> очков</p>
+                <button id="buy-upgrade-button">Купить апгрейд</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let score = 0;
-        const scoreDisplay = document.getElementById('score-display');
-        const clickButton = document.getElementById('click-button');
-        const body = document.body;
-        const backgroundContainer = document.getElementById('money-background');
+        let passiveIncomePerInterval = 0;
+        let upgradeCost = 10;
+        let upgradeCount = 0;
+        let passiveIntervalId = null;
 
-        const realisticEmojis = ['💵', '💴', '💶', '💷'];
+        const PASSIVE_INTERVAL_MS = 5000;
+
+        const scoreDisplay = document.getElementById('score-display');
+        const passiveInfoDisplay = document.getElementById('passive-info');
+        const clickButton = document.getElementById('click-button');
+        const shopButton = document.getElementById('shop-button');
+        const shopModal = document.getElementById('shop-modal');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const buyUpgradeButton = document.getElementById('buy-upgrade-button');
+        const upgradeCostDisplay = document.getElementById('upgrade-cost-display');
+        const upgradeCountDisplay = document.getElementById('upgrade-count-display');
+        const fallingElementsBackground = document.getElementById('falling-elements-background');
+        
+        const backgroundItems = ['💸', '💰', '💵', '🪙']; 
+        const clickEffectItems = ['💲', '✨', '🌟'];
 
         function updateScoreDisplay() {
             scoreDisplay.textContent = 'Score: ' + score;
+            updateShopDisplay(); 
+            updatePassiveInfo(); 
         }
 
-        function handleClick() {
+        function updatePassiveInfo() {
+            if (upgradeCount > 0) {
+                // Используем Math.floor для безопасного отображения
+                passiveInfoDisplay.textContent = `Пассивный доход: +${passiveIncomePerInterval} / 5с`;
+            } else {
+                passiveInfoDisplay.textContent = '';
+            }
+        }
+
+        function startPassiveIncome() {
+            if (passiveIntervalId) {
+                clearInterval(passiveIntervalId);
+            }
+            passiveIntervalId = setInterval(() => {
+                if (passiveIncomePerInterval > 0) {
+                    score += passiveIncomePerInterval;
+                    updateScoreDisplay();
+                }
+            }, PASSIVE_INTERVAL_MS);
+        }
+        
+        function openShop() {
+            shopModal.style.display = 'flex';
+            updateShopDisplay();
+        }
+
+        function closeShop() {
+            shopModal.style.display = 'none';
+        }
+
+        function updateShopDisplay() {
+            upgradeCostDisplay.textContent = upgradeCost;
+            upgradeCountDisplay.textContent = upgradeCount;
+            
+            if (score >= upgradeCost) {
+                buyUpgradeButton.disabled = false;
+                buyUpgradeButton.textContent = `Купить апгрейд за ${upgradeCost} очков`;
+            } else {
+                buyUpgradeButton.disabled = true;
+                buyUpgradeButton.textContent = `Нужно ${upgradeCost} очков`;
+            }
+        }
+        
+        // --- ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОКУПКИ ---
+        function buyUpgrade() {
+            if (score >= upgradeCost) {
+                // 1. СНЯТИЕ SCORE
+                score -= upgradeCost; 
+                
+                // 2. РЕГИСТРАЦИЯ АПГРЕЙДА
+                passiveIncomePerInterval += 1;
+                upgradeCount++;
+                
+                // 3. УВЕЛИЧЕНИЕ ЦЕНЫ (используем Math.ceil для округления до целого числа)
+                upgradeCost = Math.ceil(upgradeCost * 1.5); 
+                
+                if (upgradeCount === 1) {
+                    startPassiveIncome(); // Запускаем цикл пассивного дохода только один раз
+                }
+
+                updateScoreDisplay(); // Обновление всех элементов
+            }
+        }
+        // --- КОНЕЦ ИСПРАВЛЕННОЙ ФУНКЦИИ ---
+
+        function handleClick(event) {
             score++;
             updateScoreDisplay();
-            spawnClickEmoji();
+            spawnClickEffect(event.clientX, event.clientY);
         }
-
-        function createBackgroundMoneyItem() {
+        
+        function createFallingItem() {
             const item = document.createElement('span');
-            item.classList.add('money-item');
+            item.classList.add('falling-item');
             
-            item.textContent = realisticEmojis[Math.floor(Math.random() * realisticEmojis.length)];
+            item.textContent = backgroundItems[Math.floor(Math.random() * backgroundItems.length)];
             
-            const duration = Math.random() * 10 + 10;
-            const delay = Math.random() * 20;
-            const startX = Math.random() * window.innerWidth;
-            const endX = (Math.random() * 300 - 150) + 'px';
+            const duration = Math.random() * 10 + 10; 
+            const delay = Math.random() * 20; 
+            const startX = Math.random() * 100 + 'vw'; 
+            const startY = Math.random() * -30 + 'vh';
+            const endXOffset = (Math.random() * 300 - 150) + 'px';
+            const depth = (Math.random() * 200 - 100) + 'px'; 
             const rotZ = Math.random() * 720 - 360 + 'deg';
             const rotY = Math.random() * 720 - 360 + 'deg';
 
-            item.style.left = startX + 'px';
-            item.style.top = Math.random() * -100 + 'px';
+            item.style.left = startX;
+            item.style.top = startY;
             item.style.animationDuration = duration + 's';
             item.style.animationDelay = delay + 's';
-            item.style.animationName = 'realisticFall';
+            item.style.animationName = 'fallAndRotate';
 
-            item.style.setProperty('--x-end', endX);
+            item.style.setProperty('--start-x', startX);
+            item.style.setProperty('--start-y', startY);
+            item.style.setProperty('--end-x', endXOffset);
             item.style.setProperty('--z-rot', rotZ);
             item.style.setProperty('--y-rot', rotY);
+            item.style.setProperty('--depth', depth);
             
-            backgroundContainer.appendChild(item);
+            fallingElementsBackground.appendChild(item);
 
             item.addEventListener('animationiteration', () => {
                 item.remove();
-                createBackgroundMoneyItem();
+                createFallingItem();
             });
-
-             item.addEventListener('animationend', () => {
-                if (item.style.animationIterationCount !== 'infinite') {
-                     item.remove();
-                     createBackgroundMoneyItem();
+            item.addEventListener('animationend', (e) => {
+                if (e.animationName === 'fallAndRotate' && item.parentNode) {
+                    item.remove();
+                    createFallingItem();
                 }
             });
         }
 
-        const NUM_BACKGROUND_ITEMS = 100; 
-        for (let i = 0; i < NUM_BACKGROUND_ITEMS; i++) {
-            createBackgroundMoneyItem();
+        const NUM_FALLING_ITEMS = 60;
+        for (let i = 0; i < NUM_FALLING_ITEMS; i++) {
+            createFallingItem();
         }
 
-        function spawnClickEmoji() {
-            const emoji = document.createElement('span');
-            emoji.classList.add('money-emoji');
+        function spawnClickEffect(clientX, clientY) {
+            const effect = document.createElement('span');
+            effect.classList.add('click-effect');
             
-            const clickEmojis = ['💸', '💰', '💵'];
-            emoji.textContent = clickEmojis[Math.floor(Math.random() * clickEmojis.length)];
+            let effectText = '';
+            for(let i = 0; i < 3; i++) {
+                effectText += clickEffectItems[Math.floor(Math.random() * clickEffectItems.length)];
+            }
+            effect.textContent = effectText;
 
-            const buttonRect = clickButton.getBoundingClientRect();
-            const startX = buttonRect.left + buttonRect.width / 2 - 20; 
-            const startY = buttonRect.top; 
+            effect.style.left = clientX + 'px';
+            effect.style.top = clientY + 'px';
 
-            emoji.style.left = startX + (Math.random() * 40 - 20) + 'px';
-            emoji.style.top = startY + 'px'; 
+            const endXOffset = (Math.random() * 100 - 50) + 'px';
+            const endYOffset = (Math.random() * 100 - 50) + 'px';
+            effect.style.setProperty('--end-x-offset', endXOffset);
+            effect.style.setProperty('--end-y-offset', endYOffset);
+            
+            document.body.appendChild(effect);
 
-            body.appendChild(emoji);
-
-            emoji.addEventListener('animationend', () => {
-                emoji.remove();
+            effect.addEventListener('animationend', () => {
+                effect.remove();
             });
         }
 
+        // --- Обработчики Событий ---
         clickButton.addEventListener('click', handleClick);
+        shopButton.addEventListener('click', openShop);
+        closeModalButton.addEventListener('click', closeShop); 
+        // ПРОВЕРКА: Убедитесь, что эта строка активна и правильно привязана
+        buyUpgradeButton.addEventListener('click', buyUpgrade); 
+
+        window.addEventListener('click', (event) => {
+            if (event.target === shopModal) {
+                closeShop();
+            }
+        });
+        
         updateScoreDisplay();
     </script>
 </body>
