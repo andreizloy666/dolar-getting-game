@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dollar Getting - Themed</title>
+    <title>Dolar Getting - Themed</title>
     <style>
-        /* ... (CSS-стили без изменений) ... */
-        
+        /* --- GENERAL STYLES (No change) --- */
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -87,7 +86,7 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
             font-weight: bold;
         }
-
+        
         #click-button {
             padding: 25px 50px;
             font-size: 1.8em;
@@ -162,7 +161,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             width: 80%;
-            max-width: 400px;
+            max-width: 450px;
             color: #333;
             text-align: left;
             position: relative;
@@ -215,34 +214,70 @@
         .close-shop-button:hover {
             background-color: #d32f2f;
         }
+        
+        /* --- SHOP STYLES (No change) --- */
 
-        .upgrade-item {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
+        .shop-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0; 
+            margin-bottom: 15px;
+            background-color: #f0f0f0;
+            border-radius: 30px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            padding-right: 5px;
+            border: 2px solid #ddd;
         }
         
-        .upgrade-button {
-            width: 100%;
-            padding: 10px;
+        .item-details {
+            padding: 5px 15px;
+            flex-grow: 1;
+        }
+        
+        .item-details p {
+            margin: 2px 0;
+            font-size: 0.9em;
+        }
+
+        .item-details strong {
             font-size: 1.1em;
-            margin-top: 10px;
-            border: none;
-            border-radius: 5px;
+            color: #4CAF50;
+        }
+
+        .buy-button-container {
+            padding: 8px 15px;
             background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 3px 0 #3d8f3d;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: background-color 0.2s;
+            cursor: pointer;
         }
         
-        .upgrade-button:disabled {
+        .buy-button-container:hover:not(.disabled) {
+            background-color: #45a049;
+        }
+        
+        .buy-button-container.disabled {
             background-color: #ccc;
             cursor: not-allowed;
+            box-shadow: none;
         }
-        
-        .upgrade-button:not(:disabled):hover {
-            background-color: #45a049;
+
+        .buy-button {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: inherit;
+            padding: 0;
+            white-space: nowrap;
         }
 
         .click-effect {
@@ -291,109 +326,118 @@
             💎
         </button>
 
-        <h1 id="game-title">Dollar Getting</h1>
+        <h1 id="game-title">Dolar Getting</h1>
         <div id="score-display">Score: 0</div>
         
         <div id="passive-info"></div>
         <div id="multiplier-info"></div>
         
-        <button id="click-button">Click To Get Dollar!</button>
+        <button id="click-button">Click To Get Dolar!</button>
     </div>
 
     <div id="shop-modal">
         <div class="modal-content">
             <div class="close-shop-button" id="close-modal-button"></div>
             
-            <h2>Магазин Апгрейдов</h2>
+            <h2>Shop Upgrades</h2>
 
-            <div class="upgrade-item">
-                <p><strong>🌱 Пассивный Доход</strong></p>
-                <p>Улучшений: <span id="passive-upgrade-count-display">0</span></p>
-                <p>Эффект: +1 очко каждые 5 секунд (за каждое улучшение)</p>
-                <p>Цена: <span id="passive-upgrade-cost-display">10</span> очков</p>
-                <button id="buy-passive-upgrade-button" class="upgrade-button">Купить апгрейд</button>
+            <div class="shop-item-row" id="passive-upgrade-item">
+                <div class="item-details">
+                    <p><strong>🌱 Passive Income</strong></p>
+                    <p>Upgrades: <span id="passive-upgrade-count-display">0</span></p>
+                    <p>Effect: +1 score every 5s</p>
+                </div>
+                <div class="buy-button-container" id="buy-passive-upgrade-container">
+                    <button id="buy-passive-upgrade-button" class="buy-button">
+                        BUY<br>(<span id="passive-upgrade-cost-display">10</span>)
+                    </button>
+                </div>
             </div>
             
-            <div class="upgrade-item">
-                <p><strong>✨ Множитель клика x2</strong></p>
-                <p>Уровень: <span id="multiplier-upgrade-count-display">0</span></p>
-                <p>Эффект: Удваивает очки за клик (x<span id="multiplier-value-display">1</span>)</p>
-                <p>Цена: <span id="multiplier-upgrade-cost-display">100</span> очков</p>
-                <button id="buy-multiplier-upgrade-button" class="upgrade-button">Купить x2 множитель</button>
+            <div class="shop-item-row" id="multiplier-upgrade-item">
+                <div class="item-details">
+                    <p><strong>✨ Click Multiplier</strong></p>
+                    <p>Level: x<span id="multiplier-value-display">1</span></p>
+                    <p>Next: x<span id="next-multiplier-value">2</span></p>
+                </div>
+                <div class="buy-button-container" id="buy-multiplier-upgrade-container">
+                    <button id="buy-multiplier-upgrade-button" class="buy-button">
+                        BUY<br>(<span id="multiplier-upgrade-cost-display">100</span>)
+                    </button>
+                </div>
             </div>
 
         </div>
     </div>
 
     <script>
+        // --- GAME STATE VARIABLES ---
         let score = 0;
         
-        // Пассивный доход
+        // Passive Income variables
         let passiveIncomePerInterval = 0;
         let passiveUpgradeCost = 10;
         let passiveUpgradeCount = 0;
         let passiveIntervalId = null;
 
-        // Множитель клика (НОВЫЕ ПЕРЕМЕННЫЕ)
+        // Click Multiplier variables
         let clickMultiplier = 1;
         let multiplierUpgradeCost = 100;
         let multiplierUpgradeCount = 0;
 
         const PASSIVE_INTERVAL_MS = 5000;
 
-        // Элементы DOM
+        // --- DOM ELEMENTS ---
         const scoreDisplay = document.getElementById('score-display');
         const passiveInfoDisplay = document.getElementById('passive-info');
-        const multiplierInfoDisplay = document.getElementById('multiplier-info'); // НОВЫЙ ЭЛЕМЕНТ
+        const multiplierInfoDisplay = document.getElementById('multiplier-info'); 
         const clickButton = document.getElementById('click-button');
         const shopModal = document.getElementById('shop-modal');
         const shopButton = document.getElementById('shop-button');
         const closeModalButton = document.getElementById('close-modal-button');
         
-        // Пассивные апгрейды DOM
+        // Passive Upgrade DOM elements
         const buyPassiveUpgradeButton = document.getElementById('buy-passive-upgrade-button');
         const passiveUpgradeCostDisplay = document.getElementById('passive-upgrade-cost-display');
         const passiveUpgradeCountDisplay = document.getElementById('passive-upgrade-count-display');
+        const buyPassiveUpgradeContainer = document.getElementById('buy-passive-upgrade-container');
 
-        // Множитель апгрейды DOM (НОВЫЕ ЭЛЕМЕНТЫ)
+        // Multiplier Upgrade DOM elements
         const buyMultiplierUpgradeButton = document.getElementById('buy-multiplier-upgrade-button');
         const multiplierUpgradeCostDisplay = document.getElementById('multiplier-upgrade-cost-display');
-        const multiplierUpgradeCountDisplay = document.getElementById('multiplier-upgrade-count-display');
         const multiplierValueDisplay = document.getElementById('multiplier-value-display');
+        const nextMultiplierValueDisplay = document.getElementById('next-multiplier-value'); 
+        const buyMultiplierUpgradeContainer = document.getElementById('buy-multiplier-upgrade-container');
         
         const fallingElementsBackground = document.getElementById('falling-elements-background');
         
         const backgroundItems = ['💸', '💰', '💵', '🪙']; 
         const clickEffectItems = ['💲', '✨', '🌟'];
 
-        // --- ФУНКЦИИ СОХРАНЕНИЯ/ЗАГРУЗКИ ---
+        // --- SAVE/LOAD FUNCTIONS ---
         function saveGame() {
             const gameState = {
                 score: score,
                 passiveIncomePerInterval: passiveIncomePerInterval,
                 passiveUpgradeCost: passiveUpgradeCost,
                 passiveUpgradeCount: passiveUpgradeCount,
-                
-                // СОХРАНЯЕМ НОВЫЕ ПЕРЕМЕННЫЕ
                 clickMultiplier: clickMultiplier,
                 multiplierUpgradeCost: multiplierUpgradeCost,
                 multiplierUpgradeCount: multiplierUpgradeCount
             };
-            localStorage.setItem('DollarGettingSave', JSON.stringify(gameState));
+            localStorage.setItem('dolarGettingSave', JSON.stringify(gameState));
         }
 
         function loadGame() {
-            const savedState = localStorage.getItem('DollarGettingSave');
+            const savedState = localStorage.getItem('dolarGettingSave');
             if (savedState) {
                 const gameState = JSON.parse(savedState);
                 
-                // Восстанавливаем старые переменные
                 score = gameState.score || 0;
                 passiveIncomePerInterval = gameState.passiveIncomePerInterval || 0;
                 passiveUpgradeCost = gameState.passiveUpgradeCost || 10;
                 passiveUpgradeCount = gameState.passiveUpgradeCount || 0;
 
-                // ВОССТАНАВЛИВАЕМ НОВЫЕ ПЕРЕМЕННЫЕ
                 clickMultiplier = gameState.clickMultiplier || 1;
                 multiplierUpgradeCost = gameState.multiplierUpgradeCost || 100;
                 multiplierUpgradeCount = gameState.multiplierUpgradeCount || 0;
@@ -403,19 +447,20 @@
                 }
             }
         }
-        // --- КОНЕЦ ФУНКЦИЙ СОХРАНЕНИЯ/ЗАГРУЗКИ ---
 
+        // --- DISPLAY & UI UPDATES ---
         function updateScoreDisplay() {
             scoreDisplay.textContent = 'Score: ' + score;
             updateShopDisplay(); 
             updatePassiveInfo(); 
-            updateMultiplierInfo(); // ОБНОВЛЕНИЕ МНОЖИТЕЛЯ
+            updateMultiplierInfo();
             saveGame();
         }
 
         function updatePassiveInfo() {
             if (passiveUpgradeCount > 0) {
-                passiveInfoDisplay.textContent = `Пассивный доход: +${passiveIncomePerInterval} / 5с`;
+                // Translated text
+                passiveInfoDisplay.textContent = `Passive Income: +${passiveIncomePerInterval} / 5s`;
             } else {
                 passiveInfoDisplay.textContent = '';
             }
@@ -423,7 +468,8 @@
         
         function updateMultiplierInfo() {
             if (clickMultiplier > 1) {
-                multiplierInfoDisplay.textContent = `Множитель клика: x${clickMultiplier}`;
+                // Translated text
+                multiplierInfoDisplay.textContent = `Click Multiplier: x${clickMultiplier}`;
             } else {
                 multiplierInfoDisplay.textContent = '';
             }
@@ -451,31 +497,28 @@
         }
 
         function updateShopDisplay() {
-            // Пассивный доход
+            // Passive Income
             passiveUpgradeCostDisplay.textContent = passiveUpgradeCost;
             passiveUpgradeCountDisplay.textContent = passiveUpgradeCount;
             if (score >= passiveUpgradeCost) {
-                buyPassiveUpgradeButton.disabled = false;
-                buyPassiveUpgradeButton.textContent = `Купить апгрейд за ${passiveUpgradeCost} очков`;
+                buyPassiveUpgradeContainer.classList.remove('disabled');
             } else {
-                buyPassiveUpgradeButton.disabled = true;
-                buyPassiveUpgradeButton.textContent = `Нужно ${passiveUpgradeCost} очков`;
+                buyPassiveUpgradeContainer.classList.add('disabled');
             }
             
-            // Множитель клика (НОВАЯ ЛОГИКА)
+            // Click Multiplier
             multiplierUpgradeCostDisplay.textContent = multiplierUpgradeCost;
-            multiplierUpgradeCountDisplay.textContent = multiplierUpgradeCount;
             multiplierValueDisplay.textContent = clickMultiplier;
+            multiplierUpgradeCountDisplay.textContent = multiplierUpgradeCount; 
+            nextMultiplierValueDisplay.textContent = clickMultiplier * 2; 
             if (score >= multiplierUpgradeCost) {
-                buyMultiplierUpgradeButton.disabled = false;
-                buyMultiplierUpgradeButton.textContent = `Купить x2 множитель за ${multiplierUpgradeCost} очков`;
+                buyMultiplierUpgradeContainer.classList.remove('disabled');
             } else {
-                buyMultiplierUpgradeButton.disabled = true;
-                buyMultiplierUpgradeButton.textContent = `Нужно ${multiplierUpgradeCost} очков`;
+                buyMultiplierUpgradeContainer.classList.add('disabled');
             }
         }
         
-        // --- ФУНКЦИЯ ПОКУПКИ ПАССИВНОГО ДОХОДА ---
+        // --- UPGRADE BUYING LOGIC ---
         function buyPassiveUpgrade() {
             if (score >= passiveUpgradeCost) {
                 score -= passiveUpgradeCost; 
@@ -489,33 +532,23 @@
             }
         }
 
-        // --- НОВАЯ ФУНКЦИЯ ПОКУПКИ МНОЖИТЕЛЯ ---
         function buyMultiplierUpgrade() {
             if (score >= multiplierUpgradeCost) {
                 score -= multiplierUpgradeCost;
-                
-                // Удвоение множителя
                 clickMultiplier *= 2; 
                 multiplierUpgradeCount++;
-                
-                // Увеличение цены (быстрое удорожание для мощного апгрейда)
                 multiplierUpgradeCost = Math.ceil(multiplierUpgradeCost * 5); 
-                
                 updateScoreDisplay();
             }
         }
-        // --- КОНЕЦ НОВОЙ ФУНКЦИИ ---
 
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ КЛИКА ---
         function handleClick(event) {
-            // Умножаем 1 на текущий множитель
             score += 1 * clickMultiplier;
             updateScoreDisplay();
             spawnClickEffect(event.clientX, event.clientY);
         }
         
-        // ... (Функции FallingItem и ClickEffect без изменений) ...
-        
+        // --- ANIMATION LOGIC (No change) ---
         function createFallingItem() {
             const item = document.createElement('span');
             item.classList.add('falling-item');
@@ -588,14 +621,13 @@
             });
         }
 
-        // --- Обработчики Событий ---
+        // --- EVENT LISTENERS ---
         clickButton.addEventListener('click', handleClick);
         shopButton.addEventListener('click', openShop);
         closeModalButton.addEventListener('click', closeShop); 
         
-        // Привязываем функции к кнопкам
-        buyPassiveUpgradeButton.addEventListener('click', buyPassiveUpgrade); 
-        buyMultiplierUpgradeButton.addEventListener('click', buyMultiplierUpgrade); // НОВАЯ ПРИВЯЗКА
+        buyPassiveUpgradeContainer.addEventListener('click', buyPassiveUpgrade); 
+        buyMultiplierUpgradeContainer.addEventListener('click', buyMultiplierUpgrade);
 
         window.addEventListener('click', (event) => {
             if (event.target === shopModal) {
@@ -603,7 +635,7 @@
             }
         });
         
-        // --- Инициализация и автосохранение ---
+        // --- INITIALIZATION ---
         loadGame(); 
         updateScoreDisplay();
         window.onbeforeunload = saveGame;
