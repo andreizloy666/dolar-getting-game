@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dolar Getting - Themed</title>
+    <title>Dollar Getting - Themed</title>
     <style>
-        /* --- GENERAL STYLES (No change) --- */
+        /* --- GENERAL STYLES --- */
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -215,7 +215,7 @@
             background-color: #d32f2f;
         }
         
-        /* --- SHOP STYLES (No change) --- */
+        /* --- SHOP STYLES (New Look) --- */
 
         .shop-item-row {
             display: flex;
@@ -280,6 +280,7 @@
             white-space: nowrap;
         }
 
+        /* --- CLICK ANIMATION STYLES --- */
         .click-effect {
             position: absolute;
             font-size: 1.5em;
@@ -326,13 +327,13 @@
             💎
         </button>
 
-        <h1 id="game-title">Dolar Getting</h1>
+        <h1 id="game-title">Dollar Getting</h1>
         <div id="score-display">Score: 0</div>
         
         <div id="passive-info"></div>
         <div id="multiplier-info"></div>
         
-        <button id="click-button">Click To Get Dolar!</button>
+        <button id="click-button">Click To Get Dollar!</button>
     </div>
 
     <div id="shop-modal">
@@ -397,13 +398,11 @@
         const closeModalButton = document.getElementById('close-modal-button');
         
         // Passive Upgrade DOM elements
-        const buyPassiveUpgradeButton = document.getElementById('buy-passive-upgrade-button');
         const passiveUpgradeCostDisplay = document.getElementById('passive-upgrade-cost-display');
         const passiveUpgradeCountDisplay = document.getElementById('passive-upgrade-count-display');
         const buyPassiveUpgradeContainer = document.getElementById('buy-passive-upgrade-container');
 
         // Multiplier Upgrade DOM elements
-        const buyMultiplierUpgradeButton = document.getElementById('buy-multiplier-upgrade-button');
         const multiplierUpgradeCostDisplay = document.getElementById('multiplier-upgrade-cost-display');
         const multiplierValueDisplay = document.getElementById('multiplier-value-display');
         const nextMultiplierValueDisplay = document.getElementById('next-multiplier-value'); 
@@ -412,8 +411,8 @@
         const fallingElementsBackground = document.getElementById('falling-elements-background');
         
         const backgroundItems = ['💸', '💰', '💵', '🪙']; 
-        const clickEffectItems = ['💲', '✨', '🌟'];
-
+        const clickEffectItems = ['💲', '✨', '🌟']; // ВОССТАНОВЛЕНО
+        
         // --- SAVE/LOAD FUNCTIONS ---
         function saveGame() {
             const gameState = {
@@ -425,11 +424,11 @@
                 multiplierUpgradeCost: multiplierUpgradeCost,
                 multiplierUpgradeCount: multiplierUpgradeCount
             };
-            localStorage.setItem('dolarGettingSave', JSON.stringify(gameState));
+            localStorage.setItem('DollarGettingSave', JSON.stringify(gameState));
         }
 
         function loadGame() {
-            const savedState = localStorage.getItem('dolarGettingSave');
+            const savedState = localStorage.getItem('DollarGettingSave');
             if (savedState) {
                 const gameState = JSON.parse(savedState);
                 
@@ -459,7 +458,6 @@
 
         function updatePassiveInfo() {
             if (passiveUpgradeCount > 0) {
-                // Translated text
                 passiveInfoDisplay.textContent = `Passive Income: +${passiveIncomePerInterval} / 5s`;
             } else {
                 passiveInfoDisplay.textContent = '';
@@ -468,7 +466,6 @@
         
         function updateMultiplierInfo() {
             if (clickMultiplier > 1) {
-                // Translated text
                 multiplierInfoDisplay.textContent = `Click Multiplier: x${clickMultiplier}`;
             } else {
                 multiplierInfoDisplay.textContent = '';
@@ -509,7 +506,6 @@
             // Click Multiplier
             multiplierUpgradeCostDisplay.textContent = multiplierUpgradeCost;
             multiplierValueDisplay.textContent = clickMultiplier;
-            multiplierUpgradeCountDisplay.textContent = multiplierUpgradeCount; 
             nextMultiplierValueDisplay.textContent = clickMultiplier * 2; 
             if (score >= multiplierUpgradeCost) {
                 buyMultiplierUpgradeContainer.classList.remove('disabled');
@@ -542,13 +538,14 @@
             }
         }
 
+        // ИСПРАВЛЕНА: Теперь запускает анимацию клика
         function handleClick(event) {
             score += 1 * clickMultiplier;
             updateScoreDisplay();
             spawnClickEffect(event.clientX, event.clientY);
         }
         
-        // --- ANIMATION LOGIC (No change) ---
+        // --- ANIMATION LOGIC ---
         function createFallingItem() {
             const item = document.createElement('span');
             item.classList.add('falling-item');
@@ -621,13 +618,20 @@
             });
         }
 
-        // --- EVENT LISTENERS ---
+        // --- EVENT LISTENERS (Исправлено для предотвращения нежелательных анимаций) ---
         clickButton.addEventListener('click', handleClick);
         shopButton.addEventListener('click', openShop);
         closeModalButton.addEventListener('click', closeShop); 
         
-        buyPassiveUpgradeContainer.addEventListener('click', buyPassiveUpgrade); 
-        buyMultiplierUpgradeContainer.addEventListener('click', buyMultiplierUpgrade);
+        // Используем e.stopPropagation() для предотвращения "клик-анимации" на фоне при покупке
+        buyPassiveUpgradeContainer.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            buyPassiveUpgrade();
+        });
+        buyMultiplierUpgradeContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+            buyMultiplierUpgrade();
+        });
 
         window.addEventListener('click', (event) => {
             if (event.target === shopModal) {
